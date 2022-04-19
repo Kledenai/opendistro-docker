@@ -1,3 +1,4 @@
 .env
 .dccache
 *.DS_Store
+config/*
