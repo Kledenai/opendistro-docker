@@ -1,0 +1,9 @@
+elasticsearch.ssl.certificateAuthorities:
+  ["/usr/share/kibana/config/root-ca.pem"]
+#server.ssl.keyPassphrase: 6snZ1P1ERHBj
+server.name: kibana
+server.host: "0.0.0.0"
+elasticsearch.hosts: https://elastic.development.com
+elasticsearch.ssl.verificationMode: none
+elasticsearch.username: admin
+elasticsearch.password: admin
