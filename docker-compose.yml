@@ -4,10 +4,11 @@ services:
     image: amazon/opendistro-for-elasticsearch:1.13.3
     container_name: elastic
     environment:
-      - cluster.name=odfe-cluster
+      - cluster.name=elastic-cluster
       - node.name=elastic
-      - bootstrap.memory_lock=true # along with the memlock settings below, disables swapping
-      - "ES_JAVA_OPTS=-Xms512m -Xmx512m" # minimum and maximum Java heap size, recommend setting both to 50% of system RAM
+      - bootstrap.memory_lock=false
+      - discovery.type=single-node
+      - "ES_JAVA_OPTS=-Xms512m -Xmx512m"
     ulimits:
       memlock:
         soft: -1
@@ -16,7 +17,13 @@ services:
         soft: 65536 # maximum number of open files for the Elasticsearch user, set to at least 65536 on modern systems
         hard: 65536
     volumes:
-      - elastic-date:/usr/share/elasticsearch/data
+      - elastic-data:/usr/share/elasticsearch/data
+      - ./config/elasticsearch.yml:/usr/share/elasticsearch/config/elasticsearch.yml
+      - ./config/certificates/server.pem:/usr/share/elasticsearch/config/server.pem
+      - ./config/certificates/server.key:/usr/share/elasticsearch/config/server.key
+      - ./config/certificates/kirk.pem:/usr/share/elasticsearch/config/kirk.pem
+      - ./config/certificates/kirk.key:/usr/share/elasticsearch/config/kirk.key
+      - ./config/certificates/root-ca.pem:/usr/share/elasticsearch/config/root-ca.pem
     ports:
       - 9200:9200
       - 9600:9600 # required for Performance Analyzer
@@ -30,10 +37,18 @@ services:
     expose:
       - "5601"
     environment:
-      ELASTICSEARCH_URL: https://elastic:9200
-      ELASTICSEARCH_HOSTS: https://elastic:9200
+      ELASTICSEARCH_URL: https://elastic.development.com:9200
+      ELASTICSEARCH_HOSTS: https://elastic.development.com:9200
+      SERVER_SSL_ENABLED: "true"
+      SERVER_SSL_KEY: /usr/share/kibana/config/server.key
+      SERVER_SSL_CERTIFICATE: /usr/share/kibana/config/server.pem
+    volumes:
+      - ./config/kibana.yml:/usr/share/kibana/config/kibana.yml
+      - ./config/certificates/server.pem:/usr/share/kibana/config/server.pem
+      - ./config/certificates/server.key:/usr/share/kibana/config/server.key
+      - ./config/certificates/root-ca.pem:/usr/share/kibana/config/root-ca.pem
     networks:
-      - odfe-net
+      - elastic
 
 volumes:
   elastic-data:
