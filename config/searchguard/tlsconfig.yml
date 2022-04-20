@@ -1,0 +1,31 @@
+defaults:
+    validityDays: 3650
+    pkPassword: auto
+    httpsEnabled: true
+    verifyHostnames: true
+    resolveHostnames: true
+
+ca:
+  root:
+    # The distinguished name of this CA. You must specify a distinguished name.
+    dn: CN=root.example.com,OU=Ops,O=example,DC=org
+    pkPassword: auto
+    file: root-ca.pem
+
+nodes:
+  - name: wildcard
+    dn: CN=*.example.com,OU=Ops,O=example,DC=org
+    dns:
+      - master
+      - kibana
+      - master1
+      - master2
+      - master3
+      - data1
+      - data2
+      - data3
+
+clients:
+  - name: kirk
+    dn: CN=kirk.examplecom,OU=Ops,O=org,DC=org
+    admin: true

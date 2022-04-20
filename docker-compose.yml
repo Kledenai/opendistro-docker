@@ -1,4 +1,4 @@
-version: '3.9'
+version: "3.9"
 services:
   elastic:
     image: amazon/opendistro-for-elasticsearch:1.13.3
@@ -19,8 +19,8 @@ services:
     volumes:
       - elastic-data:/usr/share/elasticsearch/data
       - ./config/elasticsearch.yml:/usr/share/elasticsearch/config/elasticsearch.yml
-      - ./config/certificates/server.pem:/usr/share/elasticsearch/config/server.pem
-      - ./config/certificates/server.key:/usr/share/elasticsearch/config/server.key
+      - ./config/certificates/wildcard.pem:/usr/share/elasticsearch/config/wildcard.pem
+      - ./config/certificates/wildcard.key:/usr/share/elasticsearch/config/wildcard.key
       - ./config/certificates/kirk.pem:/usr/share/elasticsearch/config/kirk.pem
       - ./config/certificates/kirk.key:/usr/share/elasticsearch/config/kirk.key
       - ./config/certificates/root-ca.pem:/usr/share/elasticsearch/config/root-ca.pem
@@ -30,7 +30,7 @@ services:
     networks:
       - elastic
   kibana:
-    image: amazon/opendistro-for-elasticsearch-kibana:1.13.3
+    image: amazon/opendistro-for-elasticsearch-kibana:latest
     container_name: kibana
     ports:
       - 5601:5601
@@ -40,12 +40,12 @@ services:
       ELASTICSEARCH_URL: https://elastic.development.com:9200
       ELASTICSEARCH_HOSTS: https://elastic.development.com:9200
       SERVER_SSL_ENABLED: "true"
-      SERVER_SSL_KEY: /usr/share/kibana/config/server.key
-      SERVER_SSL_CERTIFICATE: /usr/share/kibana/config/server.pem
+      SERVER_SSL_KEY: /usr/share/kibana/config/wildcard.key
+      SERVER_SSL_CERTIFICATE: /usr/share/kibana/config/wildcard.pem
     volumes:
       - ./config/kibana.yml:/usr/share/kibana/config/kibana.yml
-      - ./config/certificates/server.pem:/usr/share/kibana/config/server.pem
-      - ./config/certificates/server.key:/usr/share/kibana/config/server.key
+      - ./config/certificates/wildcard.pem:/usr/share/kibana/config/wildcard.pem
+      - ./config/certificates/wildcard.key:/usr/share/kibana/config/wildcard.key
       - ./config/certificates/root-ca.pem:/usr/share/kibana/config/root-ca.pem
     networks:
       - elastic
