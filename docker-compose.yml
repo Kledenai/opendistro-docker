@@ -6,8 +6,9 @@ services:
     environment:
       - cluster.name=elastic-cluster
       - node.name=elastic
-      - bootstrap.memory_lock=false
+      - bootstrap.memory_lock=true
       - discovery.type=single-node
+      - network.host=0.0.0.0
       - "ES_JAVA_OPTS=-Xms512m -Xmx512m"
     ulimits:
       memlock:
@@ -18,17 +19,23 @@ services:
         hard: 65536
     volumes:
       - elastic-data:/usr/share/elasticsearch/data
-      - ./config/elasticsearch.yml:/usr/share/elasticsearch/config/elasticsearch.yml
       - ./config/certificates/wildcard.pem:/usr/share/elasticsearch/config/wildcard.pem
       - ./config/certificates/wildcard.key:/usr/share/elasticsearch/config/wildcard.key
       - ./config/certificates/kirk.pem:/usr/share/elasticsearch/config/kirk.pem
       - ./config/certificates/kirk.key:/usr/share/elasticsearch/config/kirk.key
       - ./config/certificates/root-ca.pem:/usr/share/elasticsearch/config/root-ca.pem
+      - ./config/elasticsearch.yml:/usr/share/elasticsearch/config/elasticsearch.yml
+      - ./config/securityconfig/config.yml:/usr/share/elasticsearch/plugins/opendistro_security/securityconfig/config.yml
+      - ./config/securityconfig/internal_users.yml:/usr/share/elasticsearch/plugins/opendistro_security/securityconfig/internal_users.yml
+      - ./config/securityconfig/nodes_dn.yml:/usr/share/elasticsearch/plugins/opendistro_security/securityconfig/nodes_dn.yml
+      - ./config/securityconfig/roles_mapping.yml:/usr/share/elasticsearch/plugins/opendistro_security/securityconfig/roles_mapping.yml
     ports:
       - 9200:9200
       - 9600:9600 # required for Performance Analyzer
     networks:
-      - elastic
+      elastic:
+        aliases:
+          - elastic.development.com
   kibana:
     image: amazon/opendistro-for-elasticsearch-kibana:latest
     container_name: kibana
@@ -37,8 +44,8 @@ services:
     expose:
       - "5601"
     environment:
-      ELASTICSEARCH_URL: https://elastic.development.com:9200
-      ELASTICSEARCH_HOSTS: https://elastic.development.com:9200
+      ELASTICSEARCH_URL: https://elastic:9200
+      ELASTICSEARCH_HOSTS: https://elastic:9200
       SERVER_SSL_ENABLED: "true"
       SERVER_SSL_KEY: /usr/share/kibana/config/wildcard.key
       SERVER_SSL_CERTIFICATE: /usr/share/kibana/config/wildcard.pem
